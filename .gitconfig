@@ -1,0 +1,128 @@
+[user]
+	email = mt.blue81@gmail.com
+	name = Shuhei Aoyama
+[color]
+  # colorの設定(以下のコマンドは自動で色つける)
+  ui = auto
+  status = auto
+  diff = auto
+  branch = auto
+  interactive = auto
+  grep = auto
+[push]
+  default = tracking       # defaultのpush先はtrackingしているリポジトリ
+[pull]
+  rebase = true
+[rebase]
+  autostash = true
+[core]
+  excludesfile = ~/.gitignore  # globalな.gitignoreの指定
+  autocrlf = input                 # CRLFを自動変換
+  whitespace = cr-at-eol
+  editor = vim -c \"set fenc=utf-8\"
+  quotepath = false
+#	pager = git-split-diffs --color | less -RFX
+
+[filter "media"]
+  clean = git-media-clean %f
+  smudge = git-media-smudge %f
+[http]
+  sslverify = false
+	postBuffer = 524288000
+[alias]
+  desc = branch --edit-description
+  fhs = "!f() { git flow hotfix start `date +%Y%m%d%H%M_`$1; }; f"
+  ffs = "!f() { git flow feature start `date +%Y%m%d%H%M_`$1; }; f"
+  st = status
+  sh = show
+  so = remote show origin
+  ft = fetch
+  up = pull --rebase       # pull rebase
+  rbd = rebase develop     # developへのrebaseはよく使うのでalias
+  ad = add
+  ci = commit -a           # modifiedなファイルを全てstageへ
+  cam = commit -a --amend  # 直前のcommitを修正
+  co = checkout
+  cb = checkout -b         # branch切ってcheckoutする
+  cd = checkout develop
+  # branch関連
+  br = branch --sort=-authordate
+  ba = branch -a           # originも含めた全てのbranchを表示
+  bm = branch --merged     # merge済みのbranchを表示
+  bn = branch --no-merged  # mergeしてないbranchを表示
+  bo = branch -r           # remote branchを表示
+  # log関連
+  wc = whatchanged         # logに変更されたファイルも一緒に出す
+  ls = log --stat          # logに変更されたファイルも一緒に出す
+  lp = log -p              # diffも一緒に出す
+  la = log --pretty=\"format:%ad %h (%an): %s\" --date=short  # ざっくりログ出す
+  lr = log origin          # originのlog
+  oneline = log --pretty=oneline
+  ranking = shortlog -s -n --no-merges
+  hist = log --graph --color --pretty='%x09%h %ad %cn%x09%s %Cred%d%Creset' --date=short
+  lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+  lga = log --graph --all --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+  # logをtree表示
+  log-graph = log --graph --date=short --pretty=format:'%Cgreen%h %cd %Cblue%cn %Creset%s'
+  log-all = log --graph --all --color --pretty='%x09%h %cn%x09%s %Cred%d%Creset'
+  # diff関連
+  dw = diff --color-words    # 単語単位でいろつけてdiff
+  dc = diff --cached         # addされているものとのdiff
+  ds = diff --staged         # 同上(1.6.1移行)
+  d1 = diff HEAD~            # HEADから1つ前とdiff
+  d2 = diff HEAD~~           # HEADから2つ前とdiff
+  d3 = diff HEAD~~~          # HEADから3つ前とdiff
+  d4 = diff HEAD~~~~         # HEADから4つ前とdiff
+  d5 = diff HEAD~~~~~        # HEADから5つ前とdiff
+  d10 = diff HEAD~~~~~~~~~~  # HEADから10前とdiff
+  # mergeの際にconflictが起きたファイルを編集
+  edit-unmerged = "!f() { git ls-files --unmerged | cut -f2 | sort -u ; }; vim `f`"
+  # mergeの際にconflictが起きたファイルをadd
+  add-unmerged = "!f() { git ls-files --unmerged | cut -f2 | sort -u ; }; git add `f`"
+  # grep関連
+  gr = grep
+  gn = grep -n
+  sm = submodule
+  smupdate = submodule foreach "git checkout master; git pull origin master"
+  # see http://d.hatena.ne.jp/thinca/20130925/1380099336
+  ignore = update-index --assume-unchanged
+  unignore = update-index --no-assume-unchanged
+  ignored = !git ls-files -v | grep "^[a-z]"
+	c = commit -v
+  pi = !git rev-parse --abbrev-ref HEAD | xargs git push --set-upstream origin
+  com = !git rev-parse --abbrev-ref HEAD | xargs hub compare
+  sco = !git branch | peco | xargs git checkout
+  brm = "!f() { git br | peco | xargs;}; git br -D `f`"
+  cop = "!f() { git br | peco | xargs;}; git co `f`"
+  p = pull -p
+
+  di = !"d() { git diff --patch-with-stat HEAD~$1; }; git diff-index --quiet HEAD -- || clear; d"
+  # 最新のcommitと現在の状態の差分を表示する
+  d = !"git diff-index --quiet HEAD -- || clear; git --no-pager diff --patch-with-stat"
+  # 全部addしてcommit
+  ca = !git add -A && git commit -av
+  # 特定のcommitを含むブランチの検索(find branch)
+  fb = "!f() { git branch -a --contains $1; }; f"
+  # ソースコードでlogを検索(find by code)
+  fc = "!f() { git log --pretty=format:'%C(yellow)%h  %Cblue%ad  %Creset%s%Cgreen  [%cn] %Cred%d' --decorate --date=short -S$1; }; f"
+  # commit messageでlogを検索(find by message)
+  fm = "!f() { git log --pretty=format:'%C(yellow)%h  %Cblue%ad  %Creset%s%Cgreen  [%cn] %Cred%d' --decorate --date=short --grep=$1; }; f"
+  # masterにmerge済みのブランチ削除(delete merged)
+  dm = "!git branch --merged | grep -v '\\*' | xargs -n 1 git branch -d"
+  # topicブランチを削除
+  dt = "!git branch | grep 'topic' | xargs -n 1 git branch -D"
+[i18n]
+  commitencoding = utf-8
+[merge]
+  ff = false
+[ghq]
+	root = ~/workspace
+[commit]
+	template = ~/.config/_commit_template
+[filter "lfs"]
+	process = git-lfs filter-process
+	required = true
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+[init]
+	defaultBranch = main
