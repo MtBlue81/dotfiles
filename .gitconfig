@@ -111,18 +111,22 @@
   dm = "!git branch --merged | grep -v '\\*' | xargs -n 1 git branch -d"
   # topicブランチを削除
   dt = "!git branch | grep 'topic' | xargs -n 1 git branch -D"
+  # merge済みのブランチを削除↲
+  brrm = "!git branch --merged | egrep -v '\\*|master|develop|main' | xargs git branch -D"
 [i18n]
   commitencoding = utf-8
 [merge]
   ff = false
 [ghq]
-	root = ~/workspace
+  root = ~/workspace
 [commit]
-	template = ~/.config/_commit_template
+  template = ~/.config/_commit_template
 [filter "lfs"]
-	process = git-lfs filter-process
-	required = true
-	clean = git-lfs clean -- %f
-	smudge = git-lfs smudge -- %f
+  process = git-lfs filter-process
+  required = true
+  clean = git-lfs clean -- %f
+  smudge = git-lfs smudge -- %f
 [init]
-	defaultBranch = main
+  defaultBranch = main
+[fetch]
+  prune = true
